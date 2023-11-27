@@ -44,3 +44,21 @@ impl std::fmt::Display for PartiallySignedTransaction {
         write!(f, "{}", base64)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::str::FromStr;
+
+    #[test]
+    fn test_pset_rountrip_b64() {
+        // Obtained from from Elements Core's contrib/assets_tutorial/pset_swap_tutorial.py
+        let pset_str = include_str!("../../tests/data/pset_swap_tutorial.base64");
+
+        let pset = PartiallySignedTransaction::from_str(pset_str).unwrap();
+
+        // FIXME: rangeproof should be some, strings should match
+        assert!(pset.inputs()[0].witness_utxo.as_ref().unwrap().witness.rangeproof.is_none());
+        assert_ne!(pset_str, pset.to_string());
+    }
+}
